@@ -1,0 +1,136 @@
+# Incomplete attempt.
+
+import math
+import time
+from random import randint
+
+class GameState:
+    def __init__(self, money, action_points, soldiers, provinces):
+        self.money_count = money
+        self.action_points = action_points
+        self.soldier_count = soldiers
+        self.province_count = provinces
+        self.development = 1
+        self.technology = 1
+        self.money_gain_per_turn = 1
+        self.action_gain_per_turn = 1
+        self.soldier_gain_per_turn = 10
+        self.turn_count = 0
+        self.raid_flag = False
+
+    def display_stats(self):
+        print(f"Your Treasury: {self.money_count}G.")
+        print(f"Your Action Points: {self.action_points}.")
+        print(f"Your provinces: {self.province_count}.")
+        print(f"Your army: {self.soldier_count} soldiers.\n")
+
+    def calculate_fees(self):
+        return self.province_count * 10 + self.soldier_count // 3
+
+    def refresh(self):
+        self.money_count += self.money_gain_per_turn * 10 - self.calculate_fees()
+        self.action_points += self.action_gain_per_turn
+
+
+def raids(state, intensity):
+    print("A raid has occurred!")
+    if int(state.soldier_count()) < intensity // 2:
+        state.soldier_count = 0
+        state.money_count -= intensity * 2
+    else:
+        print(f"Report: You lost {intensity // 2} soldiers and {intensity // 3} gold!\n")
+        state.soldier_count -= intensity // 2
+        state.money_count -= intensity // 3
+    state.raid_flag = True
+
+def regular_raids(state):
+    if state.turn_count % 3 == 0 and state.turn_count < 10 and not state.raid_flag:
+        raids(state, randint(0, 100))
+
+def exceptional_raids(state):
+    r = randint(0, 1000)
+    if math.sqrt(r * state.turn_count) * 2 > 500 and not state.raid_flag:
+        raids(state, math.sqrt(r * state.turn_count) * 2)
+
+
+def conquerable_count(soldier_count):
+    return soldier_count // 1000 - 1
+
+
+money = int(input("How much gold do you start with? "))
+provinces = int(input("How many provinces do you start with? "))
+soldiers = int(input("How many soldiers do you start with? "))
+game_state = GameState(money, 10, soldiers, provinces)
+
+time.sleep(0.8)
+running = True
+
+while running:
+    game_state.raid_flag = False
+    print(f"\nTurn {game_state.turn_count + 1}\n")
+
+    exceptional_raids(game_state)
+    regular_raids(game_state)
+
+    game_state.display_stats()
+
+    while game_state.action_points > 0:
+        action = input("What do you do? ").lower()
+        if action == "stop":
+            print("Game Over.")
+            running = False
+            break
+
+        elif action in ["pass", "skip"]:
+            print("You skipped your turn.")
+            break
+
+        elif action == "invest in money":
+            value = int(input("How much? "))
+            game_state.money_gain_per_turn += value * 0.1
+
+        elif action == "invest in army":
+            value = int(input("How much? "))
+            game_state.soldier_count += value // 2
+
+        elif action == "conquer":
+            if game_state.soldier_count >= 2000:
+                max_conquerable = conquerable_count(game_state.soldier_count)
+                value = int(input(f"You can conquer up to {max_conquerable}. How many? "))
+                if value <= max_conquerable:
+                    game_state.province_count += value
+                    game_state.soldier_count -= 1000 * value
+                else:
+                    print("You do not have enough soldiers.")
+            else:
+                print("You do not have enough soldiers.")
+
+        elif action == "invest in development":
+            if game_state.development < game_state.technology:
+                if game_state.money_count >= 5000:
+                    value = int(input(f"You can invest up to {game_state.money_count}, with a minimum of 5000. How much do you wish to invest? "))
+                    if value >= 5000:
+                        game_state.development += 0.01 * value ** 0.1
+                        game_state.money_gain_per_turn *= game_state.development
+                    else:
+                        print("Insufficient Investment. Try again.")
+                else:
+                    print("You do not have enough gold. Try again.")
+
+        elif action == "invest in technology":
+            if game_state.money_count >= 5000:
+                value = int(input(f"You can invest up to {game_state.money_count}, with a minimum of 5000. How much do you wish to invest? "))
+                if value >= 5000:
+                    game_state.technology += 0.01 * value ** 0.1
+                else:
+                    print("Insufficient Investment. Try again.")
+            else:
+                print("You do not have enough gold. Try again.")
+
+        else:
+            print("Invalid action. Try again.")
+
+        game_state.display_stats()
+
+    game_state.refresh()
+    game_state.turn_count += 1
