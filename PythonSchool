@@ -1,0 +1,471 @@
+import math
+from random import *
+
+
+# smp pour simple
+# str pour string
+# c pour + compliqué
+
+# Section 1
+# Caractéristiques et Fonctions Mathématiques
+
+def div_positif_smp(n): # V
+    liste_div = []
+    d = 1
+    while d < n:
+        if n % d == 0:
+            liste_div.append(d)
+        d += 1
+    liste_div.append(n)
+    liste_div.sort()
+    return liste_div
+def div_positif(n):
+    return [i for i in range(1, n) if n % i == 0]
+def is_prime_with_div_positif(n): # Version pas efficace en ressources
+    for i in range(2, int(math.sqrt(n))):
+        if i in div_positif(n) or n == 1 or n == 0:
+            return False
+    return True
+def is_prime_with_div_positif_v2(n): # Version pas efficace en ressources
+    if div_positif(n) != [1, n] or n <= 1:
+        return False
+    return True
+def is_prime(n): # V
+    if n == 2 or n == 3:
+        return True
+    elif n % 2 == 0 or n % 3 == 0 or n == 1:
+        return False
+    prime_factor = 5
+    while prime_factor * prime_factor <= n:
+        if n % prime_factor == 0 or n % (prime_factor + 2) == 0:
+            return False
+        prime_factor += 6
+    return True
+def is_prime_v2(n): # V
+    if n <= 1 or n % 2 == 0 or n % 3 == 0:
+        return False
+    i = 5
+    while i <= int(math.sqrt(n) + 1):
+        if n % i == 0:
+            return False
+        i += 2
+    return True
+def is_prime_v3(n):
+    if n < 2:
+        return False
+    for i in range(2, n ** 0,5 + 1):
+        if n % i == 0:
+            return False
+    return True
+def nature(n): # V
+    if n == sum(div_positif(n)) - n:
+        print(f"{n} est parfait")
+    if n < sum(div_positif(n)) - n:
+        print(f"{n} est abondant")
+    if n > sum(div_positif(n)) - n:
+        print(f"{n} est déficient")
+    print(div_positif(n))
+def nbr_sphenique(n): # V
+    prime_factors = []
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if n % i == 0 and is_prime(i):
+            prime_factors.append(i)
+            n //= i
+            if n % i == 0:
+                return False, []
+    if n > 1 and is_prime(n):
+        prime_factors.append(n)
+    if len(prime_factors) == 3:
+        return True, prime_factors
+    else:
+        return False, prime_factors
+def nbr_sphenique_v2(n): # V
+    prime_factors = []
+    for i in range(2, n):
+        if n % i == 0 and is_prime_with_div_positif(i):
+            prime_factors.append(i)
+            n //= i
+            if is_prime_with_div_positif(n):
+                return False
+    return False, prime_factors
+def pgcd(a,b): # V
+    d = b
+    r = a % b
+    while r != 0:
+        D = d
+        d = r
+        r = D % d
+    return d
+def div_commun(a,b): # V
+    l_div_commun = []
+    for i in range(len(div_positif(a))):
+        if div_positif(a)[i] in div_positif(b):
+            l_div_commun.append(div_positif(a)[i])
+    return l_div_commun
+def changement_de_base_smp(n, b): # V
+    num = []
+    while n > 0:
+        num.append(n % b)
+        n = n // b
+    return liste_inverse(num)
+def changement_de_base_smpp_str(n, b): # V
+    num = []
+    r = 0
+    while n > 0:
+        num.append(n % b)
+        n = n // b
+    for i in range(len(num)):
+        r += num[i] * pow(10,i)
+    return r
+def changement_de_base(n, b): # V
+    return [] if n == 0 else changement_de_base(n // b, b) + [n % b]
+def pourcentage(p, n):
+    return f"{((p * 100) // n)}%"
+def nombre(list):
+    n = 0
+    for i in range(len(list)):
+        n += int(list[-i - 1]) * 10 ** i
+    return n
+def prime_entre_eux(a, b):
+    if div_commun(a, b) == [1]:
+        return True
+    return False
+def bezout(a, b):
+    if not prime_entre_eux(a, b):
+        return False
+    for i in range(min(a, b)):
+        if (i * a) % b == 1:
+            return i, -((i * a - 1) // b)
+def bezout_prof(a, b):
+    u = 1
+    while (u * a) % b != 1:
+        u = u + 1
+    return u, -((u * a - 1) // b)
+def bezout_try(a, b): # Sans queue ni tête
+    return int("".join([str(i) for i in range(a) if (i * a) % b == 1])), int("".join([str(-((i * a - 1) // b)) for i in range(a) if (i * a) % b == 1]))
+def div_euclidienne(a, b):
+    a, b = max(a, b), min(a, b)
+    for i in div_positif(a):
+        if i * b == a:
+            return f"q = {i} ; r = 0"
+        if (i * b < a) and (i+1) * b > a:
+            return f"q = {i} ; r = {a - b * i}"
+def somme_div(n):
+    return sum([d for d in range(1, (n//2)+1) if n % d == 0])
+def amicaux(n, p):
+    if somme_div(n) == p and somme_div(p) == n:
+        return True
+    else:
+        return False
+def fibonacci(n): # Ne pas faire en simultané, cela 'trompe' la suite...
+    ni, ni1, ni2 = 0, 1, 0
+    for i in range(n):
+        ni2 = ni1
+        ni1 = ni
+        ni = ni1 + ni2
+    return ni, ni1, ni2
+def somme_n_composants(n): # Simple, efficace?
+    r = 0
+    for char in str(n): r += int(char)
+    return r
+def parfaits_jusque(n):
+    return [i for i in range(1, n+1) if sum(div_positif(i)) == i]
+def tri_par_selection(L):
+    for i in range(len(L)):
+        min_index = i
+        for j in range(i + 1, len(L)):
+            if L[j] < L[min_index]:
+                min_index = j
+        L[i], L[min_index] = L[min_index], L[i]
+    return L
+def sum_integers_square(n):
+    return sum([i ** 2 for i in range(1, n + 1)])
+def recherche_dichotomique(n, L):
+    L = tri_par_selection(L)
+    min, max = 0, len(L) - 1
+    while True:
+        if min > max: return False
+        elif L[(min + max) // 2] == n: return (min + max) // 2
+        elif L[(min + max) // 2] > n: max = (min + max) // 2 - 1
+        elif L[(min + max) // 2] < n: min = (min + max) // 2 + 1
+def recherche_dichotomique_cos(p, n):
+    a = 0
+    b = math.pi / 2
+    while b - a >= 10 ** (-p):
+        if math.cos((a + b) / 2) > n:
+            a = (a + b) / 2
+        else:
+            b = (a + b) / 2
+    return [a, b]
+def f(n): # définir selon besoin pour la recherche dichotomique
+    pass
+def recherche_f_dichotomique(n, min, max):
+    if min > max:
+        return False
+    while True:
+        if f((min + max) / 2) == n:
+            return (min + max) / 2
+def puissance_efficace(a, b):
+    if b % 2 == 0: return (a ** (b // 2)) ** 2
+    else: return a * a ** (b-1)
+def suite_collatz(n):
+    n, sequence = int(n), [int(n)]
+    while n > 1:
+        if n % 2 == 0: n = n//2
+        else: n = 3*n +1
+        sequence.append(n)
+    return sequence
+def longueur_max_collatz_brute(n):
+    m = 1
+    for i in range(1, n+1):
+        if len(suite_collatz(i)) > m: m = len(suite_collatz(i))
+    return m
+def factoriel_smp(n):
+    f = 1
+    for i in range(2, n+1):
+        f = f * i
+    return f
+def factoriel(n): # Fonction 'trichée' pour l'utilisation de 'enumerate'. Aussi, renvoie une liste
+    return 1 if n == 0 else [i * prod for i, prod in enumerate([1] + [i for i in range(1, n)], 1)][-1:]
+def Dioph(a,b,c,m,M):
+    L = []
+    for x in range(m, M+1):
+        for y in range(m, M+1):
+            if a * x + b * y == c:
+                L.append((x,y))
+    return L
+def Dioph_c(a,b,c,m,M):
+    L = []
+    for x in range(m, M + 1):
+        y = (c - a * x) / b
+        if find(",", str(y)) == False:
+            L.append((x, int(y)))
+    return L
+def fonction_arc_de_cercle(x):
+    return math.sqrt(1 - x * x)
+def aire_arc_cercle(n):
+    return sum([fonction_arc_de_cercle(k/n) for k in range(1, n)]) // n
+
+
+# Section 2
+# Suites et Fonctions Pythons Basiques
+
+def serie_u(u): # Basique, une série u(n+1) = 1 + 1 / (1 + u(n))
+    k = 1
+    for i in range(u):
+        u = 1 + 1 / (1 + u)
+        print("Numéro", k, "donne", u)
+        k = k + 1
+def chiffres_composants(n): # V
+    return [int(digit) for digit in str(n)]
+def chiffres_composants_smp(n): # V
+    list = []
+    for digit in str(n):
+        list.append(int(digit))
+    return list
+def changement_de_base_smp_str(n, b): # V
+    num = []
+    while n > 0:
+        num.append(str(n % b))
+        n = n // b
+    return "".join(liste_inverse(num))
+def liste_inverse_smpp(lista): # V
+    rev_list = []
+    for i in range(len(lista)):
+        rev_list.append(lista[-i-1])
+    return rev_list
+def liste_inverse_smp(lis): # V
+    rev_list = []
+    for i in range(len(lis)):
+        rev_list.insert(-i, lis[i])
+    return rev_list
+def liste_inverse(lis): # V
+    return [lis[i] for i in range(len(lis)-1, -1, -1)]
+def somme_liste_smp(n): # V
+    liste = chiffres_composants(n)
+    nombre = 0
+    for i in range(len(liste)):
+        nombre += liste[i]
+    return nombre
+def nbr_dans_nbr_sans_len(liste): # V
+    nbr = 0
+    for _ in liste:
+        nbr += 1
+    return f"In the the given list, there are {nbr} numbers."
+def suite_school_a(n):
+    return 5 * (2/3) ** n
+def suite_school_u(n):
+    u = 1
+    for i in range(n+1):
+        u = -0.5 * u + 3
+    return u
+def suite_school_liste_u(n):
+    return [suite_school_u(i) for i in range(n)]
+def suite_school_v(n):
+    u = 0
+    for i in range(n):
+        u = suite_school_u(i) - 2
+    return u
+def suite_school_w(n):
+    u1, u2 = 0, 1
+    for i in range(n):
+        u1, u2 = u1 * 4 - u2 * 3, u1
+    return u1
+def suite_school_a_b(n):
+    a, b = 0, 1
+    for i in range(n):
+        a, b = (1/2) * a + 5, 3 * a + 2 * b + 1
+    return a, b
+def suite_school_S(n):
+    return sum([i for i in range(1, n+1)])
+def suite_school_T(n):
+    return sum([i ** 2 for i in range(1, n+1)])
+def suite_school_List_R(n):
+    u, l = 3, []
+    for i in range(1, n):
+        l.append(i * 3 ** n)
+    return l
+def suite_school_Seuil1(A):
+    u, n = 2, 1
+    while u < A:
+        u = u * 1,1 ** n
+        n += 1
+    return n
+def suite_school_Seuil2(A):
+    u, n = 0, 1
+    while u < A:
+        u = int(n ** 2 - (1/n))
+        n += 1
+    return n
+def suite_school_Seuil3(n):
+    u=2
+    N=0
+    while u>10**(-n):
+        u=u*0.9
+        N=N+1
+    return N
+def suite_school_seuil4(n):
+    v=0.5
+    N=0
+    while v+3>=10**(-n):
+        N=N+1
+        v=(-3*N+1)/(N+2)
+    return N
+def valeurs_serie_exercice_157_p180(n):
+    a = 0
+    b = 1
+    for k in range(n):
+        b = 3 * a + 2 * b + 1
+        a = 0.5 * a + 5
+    return [a, b]
+def liste_exercice_1(n):
+    l = [1.5]
+    for i in range(1, n + 1):
+        l.append(l[i-1] + 3)
+    return l
+def liste_exercice_cmp_1(n):
+    return [1.5 + 3 * i for i in range(0, n+1)]
+def liste_exercice_cmp_2(n):
+    return [i for i in range(1, n + 1)]
+def liste_exercice_cmp_3(n):
+    return [i for i in range(1, n + 1) if i % 2 == 1]
+def liste_exercice_cmp_4(n):
+    return [2**i for i in range(0, n+1)]
+def liste_exercice_cmp_5(n):
+    return [-4 + 3*i for i in range(n+1)]
+def u_et_S(u_0, n):
+    u = float(u_0)
+    s = float(u_0)
+    for i in range(n):
+        u = s/(s-1)
+        s = s + u
+    return [u, s]
+def find(char, L):
+    for i in L:
+        if L[i] == char:
+            return L[i]
+    return False
+def list_dé(n):
+    return [randint(1, 6) for i in range(n)]
+def moyenne_proba(n):
+    s, l = 0, list_dé(n)
+    for i in range(len(l)):
+        s += l[i]
+    return s / n
+def fonction_DS_mystère(L):
+    T = []
+    while L != []:
+        T.append(L[-1])
+        L.remove(L[-1])
+    return T
+def proba_épreuve(l, n):
+    if randint(1, l) == n:
+        return 1
+    else:
+        return 0
+def proba_lancer_dé(n):
+    s = 0
+    for i in range(n):
+        s += proba_épreuve(6, 6)
+    return s / n
+def dix_proba():
+    L = []
+    for i in range(10):
+        L.append(randint(1, 6))
+    return L
+def estime_proba(n):
+    s = 0
+    for i in range(n):
+        if dix_proba().count(6) == 3:
+            s += 1
+    return s / n
+def jeu():
+    return True if randint(1, 10) <= 3 else False
+def proba_longueur():
+    A, B = random(), random()
+    if abs(A - B > 0.5):
+        return True
+    return False
+def estime_proba2(n):
+    s = 0
+    for i in range(n):
+        if proba_longueur():
+            s += 1
+    return s / n
+def n_parmi_c(n, c):
+    return int(factoriel(n) / factoriel(c) * factoriel(c-n))
+def count_p(L, n):
+    q = 0
+    for char in L:
+        if char == n:
+            q += 1
+    return q
+def find(n, q): # q en string
+    index = -1
+    for i in "n":
+        index += 1
+        if i == q:
+            return index
+    return False
+def arrondi(n, q):
+    return math.floor(n * 10 ** q) / 10 ** q
+def longest_str(q, n):
+    L, m, maxi = list_dé(n), 0, 0
+    for i in L:
+        if i == q:
+            m += 1
+        else:
+            if maxi < m:
+                maxi = m
+            m = 0
+    return maxi
+def estimex4(n):
+    s = 0
+    for _ in range(n):
+        if jeu() and jeu() and jeu() and not jeu() and not jeu():
+            s += 1
+    return s/n
+
+# Section 3
+# A utiliser pour tester les fonctions
+
